@@ -8,16 +8,6 @@ public class BattleSession : MonoBehaviour
 	float pOneExpected, pTwoExpected;
 	
 	
-	
-	private void Update() 
-	{		
-		if(Input.GetKeyDown(KeyCode.A))
-		{
-			PlayerOneWins();
-		}
-	}
-	
-	
 	void CalculateExpectedValues()
 	{
 		pOneExpected = 1/

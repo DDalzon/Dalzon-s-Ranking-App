@@ -16,4 +16,14 @@ public class Player : MonoBehaviour
 	{
 		rating = newRating;
 	}
+	
+	public void SetName(string name)
+	{
+		playerName = name;
+	}
+	
+	public void SetRating(int startingRating)
+	{
+		rating = startingRating;
+	}
 }
