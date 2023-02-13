@@ -7,6 +7,11 @@ public class Player : MonoBehaviour
 	[SerializeField] string playerName;
 	[SerializeField] int rating;
 	
+	public string Name()
+	{
+		return playerName;
+	}
+	
 	public float Rating()
 	{
 		return rating;

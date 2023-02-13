@@ -8,6 +8,27 @@ public class BattleSession : MonoBehaviour
 	float pOneExpected, pTwoExpected;
 	
 	
+	public void SetPlayerOne(Player player)
+	{
+		playerOne = player;
+	}
+	
+	public void SetPlayerTwo(Player player)
+	{
+		playerTwo = player;
+	}
+	
+	public Player PlayerOne()
+	{
+		return playerOne;
+	}
+	
+	public Player PlayerTwo()
+	{
+		return playerTwo;
+	}
+	
+	
 	void CalculateExpectedValues()
 	{
 		pOneExpected = 1/

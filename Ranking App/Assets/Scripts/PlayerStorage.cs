@@ -31,6 +31,11 @@ public class PlayerStorage : MonoBehaviour
 		
 		//Adding Player
 		players.Add(newPlayer);
-		FindObjectOfType<UIManager>().HideNewPlayerCanvas();
+		FindObjectOfType<UIManager>().ShowMainCanvas();
+	}
+	
+	public List<Player> Players()
+	{
+		return players;
 	}
 }
