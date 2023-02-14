@@ -6,6 +6,7 @@ public class BattleSession : MonoBehaviour
 {
 	[SerializeField] Player playerOne, playerTwo;
 	float pOneExpected, pTwoExpected;
+	int pOneDiff, pTwoDiff;
 	
 	
 	public void SetPlayerOne(Player player)
@@ -28,6 +29,14 @@ public class BattleSession : MonoBehaviour
 		return playerTwo;
 	}
 	
+	public Player[] CurrentPlayers()
+	{
+		Player[] currentPlayers = new Player[2];
+		currentPlayers[0] = playerOne;
+		currentPlayers[1] = playerTwo;
+		return currentPlayers;
+	}
+	
 	
 	void CalculateExpectedValues()
 	{
@@ -39,36 +48,58 @@ public class BattleSession : MonoBehaviour
 	}
 
 	
-	void PlayerOneWins()
+	public void PlayerOneWins()
 	{
 		CalculateExpectedValues();
 		
+		int oldPoneRating = (int)Mathf.Round(playerOne.Rating());
 		float newPOneRating = playerOne.Rating() + 32*(1 - pOneExpected);
 		playerOne.UpdateRating((int)Mathf.Round(newPOneRating));
+		pOneDiff = (int)Mathf.Round(newPOneRating - oldPoneRating);
 		
+		int oldPTwoRating = (int)Mathf.Round(playerTwo.Rating());
 		float newPTwoRating = playerTwo.Rating() + 32*(0 - pTwoExpected);
 		playerTwo.UpdateRating((int)Mathf.Round(newPTwoRating));
+		pTwoDiff = (int)Mathf.Round(newPTwoRating - oldPTwoRating);
 	}
 	
-	void PlayerTwoWins()
+	public void PlayerTwoWins()
 	{
 		CalculateExpectedValues();
 		
+		int oldPoneRating = (int)Mathf.Round(playerOne.Rating());
 		float newPOneRating = playerOne.Rating() + 32*(0 - pOneExpected);
 		playerOne.UpdateRating((int)Mathf.Round(newPOneRating));
+		pOneDiff = (int)Mathf.Round(newPOneRating - oldPoneRating);
 		
+		int oldPTwoRating = (int)Mathf.Round(playerTwo.Rating());
 		float newPTwoRating = playerTwo.Rating() + 32*(1 - pTwoExpected);
 		playerTwo.UpdateRating((int)Mathf.Round(newPTwoRating));
+		pTwoDiff = (int)Mathf.Round(newPTwoRating - oldPTwoRating);
 	}
 	
-	void Draw()
+	public void Draw()
 	{
 		CalculateExpectedValues();
 		
+		int oldPoneRating = (int)Mathf.Round(playerOne.Rating());
 		float newPOneRating = playerOne.Rating() + 32*(0.5f - pOneExpected);
 		playerOne.UpdateRating((int)Mathf.Round(newPOneRating));
+		pOneDiff = (int)Mathf.Round(newPOneRating - oldPoneRating);
 		
+		int oldPTwoRating = (int)Mathf.Round(playerTwo.Rating());
 		float newPTwoRating = playerTwo.Rating() + 32*(0.5f - pTwoExpected);
 		playerTwo.UpdateRating((int)Mathf.Round(newPTwoRating));
+		pTwoDiff = (int)Mathf.Round(newPTwoRating - oldPTwoRating);
+	}
+	
+	public int PlayerOneDiff()
+	{
+		return pOneDiff;
+	}
+	
+	public int PlayerTwoDiff()
+	{
+		return pTwoDiff;
 	}
 }

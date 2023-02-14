@@ -18,13 +18,23 @@ public class UIManager : MonoBehaviour
 	[SerializeField] GameObject ratingInputField;
 
 	[Header("Battle UI")]
+	[SerializeField] GameObject pOneInputField;
 	[SerializeField] Text pOneInputFieldText;
 	[SerializeField] Text pOneInfoText;
 	[SerializeField] GameObject setOneButton;
 	[SerializeField] GameObject[] pOneInputSet;
 	[SerializeField] GameObject pTwoInputField;
-	[SerializeField] Text pTwoInputFieldtext;
+	[SerializeField] Text pTwoInputFieldText;
+	[SerializeField] Text pTwoInfoText;
 	[SerializeField] GameObject setTwoButton;
+	[SerializeField] GameObject[] pTwoInputSet;
+	[SerializeField] GameObject[] winnerMenu;
+	[SerializeField] Text winnerInputFieldText;
+	[SerializeField] GameObject confirmWinButton;
+	[SerializeField] Text playerOneDiff;
+	[SerializeField] Text playerTwoDiff;
+	[SerializeField] GameObject cancelButton;
+	Player winner;
 
 
 
@@ -38,6 +48,8 @@ public class UIManager : MonoBehaviour
 	{
 		VerifyInputs();
 		VerifyNameOne();
+		VerifyNameTwo();
+		VerifyWinnerName();
 	}
 
 	public void ShowNewPlayerCanvas()
@@ -58,6 +70,7 @@ public class UIManager : MonoBehaviour
 
 	public void ShowBattleCanvas()
 	{
+		ResetBattleCanvas();
 		battleCanvas.enabled = true;
 		newPlayerCanvas.enabled = false;
 		mainCanvas.enabled = false;
@@ -121,8 +134,8 @@ public class UIManager : MonoBehaviour
 		List<Player> players = FindObjectOfType<PlayerStorage>().Players();
 		foreach (var item in players)
 		{
-			if (item.Name() == pTwoInputFieldtext.text &&
-				item.Name() != pOneInputFieldText.text)
+			if (item.Name() == pTwoInputFieldText.text &&
+			item.Name() != FindObjectOfType<BattleSession>().PlayerOne().Name())
 			{
 				setTwoButton.SetActive(true);
 				break;
@@ -136,6 +149,7 @@ public class UIManager : MonoBehaviour
 
 	public void SetPlayerOne()
 	{
+		setOneButton.GetComponent<Text>().enabled = false;
 		//Set Player
 		Player playerOne = new Player();
 		List<Player> players = FindObjectOfType<PlayerStorage>().Players();
@@ -152,12 +166,180 @@ public class UIManager : MonoBehaviour
 		pTwoInputField.SetActive(true);
 
 		//Set P1 Text
-		setOneButton.GetComponent<Text>().enabled = false;
+		
 		pOneInfoText.enabled = true;
 		foreach (var item in pOneInputSet)
 		{
 			item.SetActive(false);
 		}
-		pOneInfoText.text = playerOne.Name() + "\n" + "|| " + playerOne.Rating() + " ||";
+		pOneInfoText.text = playerOne.Name() + "\n|| " + playerOne.Rating() + " ||";
+		SetTextColor(playerOne, pOneInfoText);
+	}
+
+	public void SetPlayerTwo()
+	{
+		setTwoButton.GetComponent<Text>().enabled = false;
+		Player playerTwo = new Player();
+		List<Player> players = FindObjectOfType<PlayerStorage>().Players();
+		foreach (var item in players)
+		{
+			if (item.Name() == pTwoInputFieldText.text)
+			{
+				playerTwo = item;
+			}
+		}
+		FindObjectOfType<BattleSession>().SetPlayerTwo(playerTwo);
+
+		setTwoButton.SetActive(false);
+		pTwoInfoText.enabled = true;
+		pTwoInfoText.text = playerTwo.Name() + "\n|| " + playerTwo.Rating() + " ||";
+		SetTextColor(playerTwo, pTwoInfoText);
+		foreach (var item in pTwoInputSet)
+		{
+			item.SetActive(false);
+		}
+
+		EnableWinnerMenu();
+	}
+
+	void VerifyWinnerName()
+	{
+		Player[] currentPlayers = FindObjectOfType<BattleSession>().CurrentPlayers();
+		if (currentPlayers[0] != null && currentPlayers[1] != null)
+		{
+			foreach (var item in currentPlayers)
+			{
+				if (winnerInputFieldText.text == item.Name())
+				{
+					confirmWinButton.SetActive(true);
+					winner = item;
+					break;
+				}
+				else
+				{
+					confirmWinButton.SetActive(false);
+					winner = null; //not really needed but, just in case...
+				}
+			}
+		}
+	}
+	
+	public void CalculateVictoryPoints()
+	{
+		Player[] currentPlayers = FindObjectOfType<BattleSession>().CurrentPlayers();
+		if (winnerInputFieldText.text == currentPlayers[0].Name())
+		{
+			FindObjectOfType<BattleSession>().PlayerOneWins();
+		}
+		else if(winnerInputFieldText.text == currentPlayers[1].Name())
+		{
+			FindObjectOfType<BattleSession>().PlayerTwoWins();
+		}
+		
+		ProcessCalculation();
+	}
+	
+	public void CalculateDrawPoints()
+	{
+		FindObjectOfType<BattleSession>().Draw();
+		ProcessCalculation();
+	}
+	
+	void UpdatePlayerTextData()
+	{
+		Player playerOne = FindObjectOfType<BattleSession>().PlayerOne();
+		pOneInfoText.text = playerOne.Name() + "\n|| " + playerOne.Rating() + " ||";
+		SetTextColor(playerOne, pOneInfoText);
+		
+		Player playerTwo = FindObjectOfType<BattleSession>().PlayerTwo();
+		pTwoInfoText.text = playerTwo.Name() + "\n|| " + playerTwo.Rating() + " ||";
+		SetTextColor(playerTwo, pTwoInfoText);
+	}
+	
+	void DisableWinnerMenu()
+	{
+		foreach(var item in winnerMenu)
+			{
+				item.SetActive(false);
+			}
+	}
+	
+	void EnableWinnerMenu()
+	{
+		foreach (var item in winnerMenu)
+		{
+			item.SetActive(true);
+		}
+	}
+	
+	void SetPlayerDiffs()
+	{
+		BattleSession battleSession = FindObjectOfType<BattleSession>();
+		
+		if(battleSession.PlayerOneDiff() >= 0)
+		{
+			playerOneDiff.text = "+" + battleSession.PlayerOneDiff();
+		}else
+		{
+			playerOneDiff.text = "" + battleSession.PlayerOneDiff();
+		}
+		
+		if(battleSession.PlayerTwoDiff() >= 0)
+		{
+			playerTwoDiff.text = "+" + battleSession.PlayerTwoDiff();
+		}else
+		{
+			playerTwoDiff.text = "" + battleSession.PlayerTwoDiff();
+		}
+	}
+	
+	IEnumerator RestartWinnerMenu()
+	{
+		yield return new WaitForSeconds(1.5f);
+		EnableWinnerMenu();
+		cancelButton.SetActive(true);
+		playerOneDiff.enabled = false;
+		playerTwoDiff.enabled = false;
+		confirmWinButton.GetComponent<Button>().enabled = true;
+		confirmWinButton.GetComponent<Image>().enabled = true;
+	}
+	
+	void ProcessCalculation()
+	{
+		confirmWinButton.GetComponent<Button>().enabled = false;
+		confirmWinButton.GetComponent<Image>().enabled = false;
+		UpdatePlayerTextData();
+		DisableWinnerMenu();
+		cancelButton.SetActive(false);
+		playerOneDiff.enabled = true;
+		playerTwoDiff.enabled = true;
+		SetPlayerDiffs();
+		StartCoroutine(RestartWinnerMenu());
+	}
+	
+	void ResetBattleCanvas()
+	{
+		pOneInputField.GetComponent<InputField>().SetTextWithoutNotify("");
+		pTwoInputField.GetComponent<InputField>().SetTextWithoutNotify("");
+		pOneInfoText.enabled = false;
+		pTwoInfoText.enabled = false;
+		setOneButton.GetComponent<Text>().enabled = true;
+		setTwoButton.GetComponent<Text>().enabled = true;
+		foreach(var item in pOneInputSet)
+		{
+			item.SetActive(true);
+		}
+		pTwoInputSet[0].SetActive(true);
+		winnerMenu[1].GetComponent<InputField>().SetTextWithoutNotify("");
+		DisableWinnerMenu();
+	}
+	
+	void SetTextColor(Player player, Text theText)
+	{
+		Belt[] belts = FindObjectsOfType<Belt>();
+		foreach (var item in belts)
+		{
+			item.ApplyBeltColor(player, theText);
+		}
 	}
 }
