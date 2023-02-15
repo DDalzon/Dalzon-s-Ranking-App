@@ -36,6 +36,9 @@ public class UIManager : MonoBehaviour
 	[SerializeField] GameObject cancelButton;
 	Player winner;
 
+	[Header("Main UI")]
+	[SerializeField] Text[] playersTexts;
+
 
 
 
@@ -50,6 +53,7 @@ public class UIManager : MonoBehaviour
 		VerifyNameOne();
 		VerifyNameTwo();
 		VerifyWinnerName();
+		SetMainCanvasTexts();
 	}
 
 	public void ShowNewPlayerCanvas()
@@ -111,6 +115,8 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
+
+
 	//Battle Session Code:
 	void VerifyNameOne()
 	{
@@ -166,7 +172,7 @@ public class UIManager : MonoBehaviour
 		pTwoInputField.SetActive(true);
 
 		//Set P1 Text
-		
+
 		pOneInfoText.enabled = true;
 		foreach (var item in pOneInputSet)
 		{
@@ -223,7 +229,7 @@ public class UIManager : MonoBehaviour
 			}
 		}
 	}
-	
+
 	public void CalculateVictoryPoints()
 	{
 		Player[] currentPlayers = FindObjectOfType<BattleSession>().CurrentPlayers();
@@ -231,39 +237,39 @@ public class UIManager : MonoBehaviour
 		{
 			FindObjectOfType<BattleSession>().PlayerOneWins();
 		}
-		else if(winnerInputFieldText.text == currentPlayers[1].Name())
+		else if (winnerInputFieldText.text == currentPlayers[1].Name())
 		{
 			FindObjectOfType<BattleSession>().PlayerTwoWins();
 		}
-		
+
 		ProcessCalculation();
 	}
-	
+
 	public void CalculateDrawPoints()
 	{
 		FindObjectOfType<BattleSession>().Draw();
 		ProcessCalculation();
 	}
-	
+
 	void UpdatePlayerTextData()
 	{
 		Player playerOne = FindObjectOfType<BattleSession>().PlayerOne();
 		pOneInfoText.text = playerOne.Name() + "\n|| " + playerOne.Rating() + " ||";
 		SetTextColor(playerOne, pOneInfoText);
-		
+
 		Player playerTwo = FindObjectOfType<BattleSession>().PlayerTwo();
 		pTwoInfoText.text = playerTwo.Name() + "\n|| " + playerTwo.Rating() + " ||";
 		SetTextColor(playerTwo, pTwoInfoText);
 	}
-	
+
 	void DisableWinnerMenu()
 	{
-		foreach(var item in winnerMenu)
-			{
-				item.SetActive(false);
-			}
+		foreach (var item in winnerMenu)
+		{
+			item.SetActive(false);
+		}
 	}
-	
+
 	void EnableWinnerMenu()
 	{
 		foreach (var item in winnerMenu)
@@ -271,28 +277,30 @@ public class UIManager : MonoBehaviour
 			item.SetActive(true);
 		}
 	}
-	
+
 	void SetPlayerDiffs()
 	{
 		BattleSession battleSession = FindObjectOfType<BattleSession>();
-		
-		if(battleSession.PlayerOneDiff() >= 0)
+
+		if (battleSession.PlayerOneDiff() >= 0)
 		{
 			playerOneDiff.text = "+" + battleSession.PlayerOneDiff();
-		}else
-		{
-			playerOneDiff.text = "" + battleSession.PlayerOneDiff();
 		}
-		
-		if(battleSession.PlayerTwoDiff() >= 0)
+		else
+		{
+			playerOneDiff.text = battleSession.PlayerOneDiff().ToString();
+		}
+
+		if (battleSession.PlayerTwoDiff() >= 0)
 		{
 			playerTwoDiff.text = "+" + battleSession.PlayerTwoDiff();
-		}else
+		}
+		else
 		{
-			playerTwoDiff.text = "" + battleSession.PlayerTwoDiff();
+			playerTwoDiff.text = battleSession.PlayerTwoDiff().ToString();
 		}
 	}
-	
+
 	IEnumerator RestartWinnerMenu()
 	{
 		yield return new WaitForSeconds(1.5f);
@@ -303,7 +311,7 @@ public class UIManager : MonoBehaviour
 		confirmWinButton.GetComponent<Button>().enabled = true;
 		confirmWinButton.GetComponent<Image>().enabled = true;
 	}
-	
+
 	void ProcessCalculation()
 	{
 		confirmWinButton.GetComponent<Button>().enabled = false;
@@ -316,7 +324,7 @@ public class UIManager : MonoBehaviour
 		SetPlayerDiffs();
 		StartCoroutine(RestartWinnerMenu());
 	}
-	
+
 	void ResetBattleCanvas()
 	{
 		pOneInputField.GetComponent<InputField>().SetTextWithoutNotify("");
@@ -325,7 +333,7 @@ public class UIManager : MonoBehaviour
 		pTwoInfoText.enabled = false;
 		setOneButton.GetComponent<Text>().enabled = true;
 		setTwoButton.GetComponent<Text>().enabled = true;
-		foreach(var item in pOneInputSet)
+		foreach (var item in pOneInputSet)
 		{
 			item.SetActive(true);
 		}
@@ -333,13 +341,37 @@ public class UIManager : MonoBehaviour
 		winnerMenu[1].GetComponent<InputField>().SetTextWithoutNotify("");
 		DisableWinnerMenu();
 	}
-	
+
 	void SetTextColor(Player player, Text theText)
 	{
 		Belt[] belts = FindObjectsOfType<Belt>();
 		foreach (var item in belts)
 		{
 			item.ApplyBeltColor(player, theText);
+		}
+	}
+
+
+
+	//MainCanvas UI Code:
+	void SetMainCanvasTexts()
+	{
+		Player[] players = FindObjectsOfType<Player>();
+		if (players != null)
+		{
+			foreach (Player player in players)
+			{
+				foreach (Text text in playersTexts)
+				{
+					if (!player.showingOnMain && text.text == "")
+					{
+						text.text = player.Name() + "\n|| " + player.Rating() + " ||";
+						SetTextColor(player, text);
+						player.showingOnMain = true;
+						break;
+					}
+				}
+			}
 		}
 	}
 }

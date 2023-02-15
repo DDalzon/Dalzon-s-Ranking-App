@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
 	[SerializeField] string playerName;
 	[SerializeField] int rating;
+	public bool showingOnMain;
 	
 	public string Name()
 	{
@@ -30,5 +31,10 @@ public class Player : MonoBehaviour
 	public void SetRating(int startingRating)
 	{
 		rating = startingRating;
+	}
+	
+	public string Plate()
+	{
+		return playerName + "\n|| " + rating + " ||";
 	}
 }
