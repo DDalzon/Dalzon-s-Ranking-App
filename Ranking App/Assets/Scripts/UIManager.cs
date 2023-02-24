@@ -38,6 +38,7 @@ public class UIManager : MonoBehaviour
 
 	[Header("Main UI")]
 	[SerializeField] Text[] playersTexts;
+	[SerializeField] GameObject addPlayerMainButton;
 
 
 
@@ -49,6 +50,7 @@ public class UIManager : MonoBehaviour
 
 	void Update()
 	{
+		VerifyPlayerCount();
 		VerifyInputs();
 		VerifyNameOne();
 		VerifyNameTwo();
@@ -86,6 +88,18 @@ public class UIManager : MonoBehaviour
 	{
 		nameInputField.GetComponentInParent<InputField>().SetTextWithoutNotify("");
 		ratingInputField.GetComponentInParent<InputField>().SetTextWithoutNotify("");
+	}
+	
+	void VerifyPlayerCount()
+	{
+		Player[] players = FindObjectsOfType<Player>();
+		if(players.Length < 10)
+		{
+			addPlayerMainButton.SetActive(true);
+		}else
+		{
+			addPlayerMainButton.SetActive(false);
+		}
 	}
 
 	void VerifyInputs()
@@ -164,9 +178,10 @@ public class UIManager : MonoBehaviour
 			if (item.Name() == pOneInputFieldText.text)
 			{
 				playerOne = item;
+				FindObjectOfType<BattleSession>().SetPlayerOne(playerOne);
 			}
 		}
-		FindObjectOfType<BattleSession>().SetPlayerOne(playerOne);
+		
 
 		//Activate P2 input field
 		pTwoInputField.SetActive(true);
@@ -354,7 +369,7 @@ public class UIManager : MonoBehaviour
 
 
 	//MainCanvas UI Code:
-	void SetMainCanvasTexts()
+	public void SetMainCanvasTexts()
 	{
 		Player[] players = FindObjectsOfType<Player>();
 		if (players != null)
@@ -374,4 +389,7 @@ public class UIManager : MonoBehaviour
 			}
 		}
 	}
+	
+	//Tens que criar uma variavel na classe Player pra guardar o texto determinado acima
+	//e depois criar uma função (aqui ou la) pra atualizar as cores e os textos.
 }
