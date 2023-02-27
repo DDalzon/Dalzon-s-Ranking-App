@@ -39,6 +39,7 @@ public class UIManager : MonoBehaviour
 	[Header("Main UI")]
 	[SerializeField] Text[] playersTexts;
 	[SerializeField] GameObject addPlayerMainButton;
+	public bool savedInfo;
 
 
 
@@ -56,6 +57,10 @@ public class UIManager : MonoBehaviour
 		VerifyNameTwo();
 		VerifyWinnerName();
 		SetMainCanvasTexts();
+		if(savedInfo)
+		{
+			FindObjectOfType<PlayerStorage>().DisableLoadButton();
+		}
 	}
 
 	public void ShowNewPlayerCanvas()
@@ -72,6 +77,7 @@ public class UIManager : MonoBehaviour
 		battleCanvas.enabled = false;
 		newPlayerCanvas.enabled = false;
 		mainCanvas.enabled = true;
+		UpdateMainCanvasTexts();
 	}
 
 	public void ShowBattleCanvas()
@@ -258,12 +264,14 @@ public class UIManager : MonoBehaviour
 		}
 
 		ProcessCalculation();
+		FindObjectOfType<PlayerStorage>().SavePlayers();
 	}
 
 	public void CalculateDrawPoints()
 	{
 		FindObjectOfType<BattleSession>().Draw();
 		ProcessCalculation();
+		FindObjectOfType<PlayerStorage>().SavePlayers();
 	}
 
 	void UpdatePlayerTextData()
@@ -357,7 +365,7 @@ public class UIManager : MonoBehaviour
 		DisableWinnerMenu();
 	}
 
-	void SetTextColor(Player player, Text theText)
+	public void SetTextColor(Player player, Text theText)
 	{
 		Belt[] belts = FindObjectsOfType<Belt>();
 		foreach (var item in belts)
@@ -383,6 +391,7 @@ public class UIManager : MonoBehaviour
 						text.text = player.Name() + "\n|| " + player.Rating() + " ||";
 						SetTextColor(player, text);
 						player.showingOnMain = true;
+						player.SetMyText(text);
 						break;
 					}
 				}
@@ -390,6 +399,12 @@ public class UIManager : MonoBehaviour
 		}
 	}
 	
-	//Tens que criar uma variavel na classe Player pra guardar o texto determinado acima
-	//e depois criar uma função (aqui ou la) pra atualizar as cores e os textos.
+	public void UpdateMainCanvasTexts()
+	{
+		Player[] players = FindObjectsOfType<Player>();
+		foreach(var item in players)
+		{
+			item.UpdateMainUIText();
+		}
+	}
 }

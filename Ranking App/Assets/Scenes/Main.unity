@@ -4873,6 +4873,7 @@ MonoBehaviour:
   nameInputField: {fileID: 328486695}
   ratingInputField: {fileID: 312802642}
   playerPrefab: {fileID: 2671956742353490589, guid: b8394d455f8f2624aba59f31c045c0ed, type: 3}
+  loadButton: {fileID: 1540849309}
 --- !u!4 &1621393623
 Transform:
   m_ObjectHideFlags: 0
